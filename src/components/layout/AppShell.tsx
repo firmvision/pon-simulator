@@ -13,8 +13,11 @@ import { EventLog } from '../log/EventLog';
 import { BandwidthChart } from '../charts/BandwidthChart';
 import { PowerBudgetChart } from '../charts/PowerBudgetChart';
 import { InstallPrompt } from '../pwa/InstallPrompt';
+import { MobileShell } from './MobileShell';
+import { useMobile } from '../../hooks/useMobile';
 
 export function AppShell() {
+  const isMobile = useMobile();
   const { activeRightPanel, activeBottomPanel, setActiveRightPanel, setActiveBottomPanel } = useUIStore();
   const selectedId = useTopologyStore(s => s.selectedNodeId);
   const onus = useTopologyStore(s => s.onus);
@@ -42,6 +45,8 @@ export function AppShell() {
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, []);
+
+  if (isMobile) return <MobileShell />;
 
   const tabBtn = (label: string, active: boolean, onClick: () => void) => (
     <button onClick={onClick} style={{
