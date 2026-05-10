@@ -251,7 +251,7 @@ class SimulationEngine {
 
   private handleDBACycle() {
     const { onus } = useTopologyStore.getState();
-    const { simTimestamp, updateTrafficFlow } = useSimulationStore.getState();
+    const { simTimestamp } = useSimulationStore.getState();
     const onuList = Object.values(onus);
 
     // Run DBA for first OLT's standard (assume homogeneous for now)

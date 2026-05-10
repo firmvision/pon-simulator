@@ -1,7 +1,7 @@
 import { useTopologyStore } from '../../store/topologyStore';
 import { useSimulationStore } from '../../store/simulationStore';
 import { ONU_STATE_LABELS } from '../../types/protocol';
-import { formatPower, formatBandwidth } from '../../utils/formatters';
+import { formatPower } from '../../utils/formatters';
 
 export interface CommandResult {
   lines: Array<{ text: string; type: 'output' | 'error' | 'success' | 'info' | 'table' }>;

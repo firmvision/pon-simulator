@@ -36,11 +36,10 @@ export const OLTNode = memo(({ data, selected }: NodeProps) => {
         <div style={{ color: '#475569', fontSize: 9 }}>{olt.standard}</div>
         <div style={{ marginTop: 5, display: 'flex', gap: 3, flexWrap: 'wrap' }}>
           {olt.ponPorts.map((port) => (
-            <div key={port.id} style={{
+            <div key={port.id} title={`PON ${port.portIndex}`} style={{
               width: 8, height: 8, borderRadius: 2,
               background: port.connectedONUIds.length > 0 ? '#4ade80' : '#334155',
               border: '1px solid #1e3a5f',
-              title: `PON ${port.portIndex}`,
             }} />
           ))}
         </div>

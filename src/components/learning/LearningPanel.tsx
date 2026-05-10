@@ -201,7 +201,6 @@ function QuizView({ module }: { module: LearningModule }) {
 
   const q = module.quiz[qIdx];
   const isCorrect = submitted && selected === q.answer;
-  const isWrong = submitted && selected !== null && selected !== q.answer;
 
   const handleSubmit = () => {
     if (selected === null) return;
@@ -347,7 +346,7 @@ export function LearningPanel() {
       {/* Module selector */}
       <div style={{ padding: '6px 8px', borderBottom: '1px solid #1e293b', flexShrink: 0 }}>
         <div style={{ display: 'flex', gap: 4, justifyContent: 'space-between' }}>
-          {LEARNING_MODULES.map((m, idx) => {
+          {LEARNING_MODULES.map((m) => {
             const active = m.id === activeModuleId;
             return (
               <button

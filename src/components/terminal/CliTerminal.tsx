@@ -1,6 +1,5 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { useUIStore } from '../../store/uiStore';
-import { useTopologyStore } from '../../store/topologyStore';
 import { executeCommand } from './commandParser';
 
 const PROMPT = 'MA5800-X17(config)# ';

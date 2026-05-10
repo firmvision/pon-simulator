@@ -1,11 +1,9 @@
-import { useCallback } from 'react';
 import { useTopologyStore } from '../../store/topologyStore';
 import { useSimulationStore } from '../../store/simulationStore';
 import { useUIStore } from '../../store/uiStore';
 import { simEngine } from '../../simulation/engine';
 import { saveProjectToFile, loadProjectFromFile } from '../../utils/persistence';
 import { SAMPLE_TOPOLOGIES } from '../../data/sampleTopologies';
-import type { SplitterRatio } from '../../types/network';
 
 const DEVICES = [
   { type: 'olt', label: 'OLT', color: '#1d4ed8', desc: 'Optical Line Terminal' },
@@ -19,7 +17,7 @@ const DEVICES = [
 export function Toolbar() {
   const { running, speedMultiplier, setSpeed } = useSimulationStore();
   const { exportProject, loadProject, reset } = useTopologyStore();
-  const { appendTerminalLine } = useUIStore();
+  useUIStore();
 
   const onDragStart = (e: React.DragEvent, type: string) => {
     e.dataTransfer.setData('application/pon-device', type);

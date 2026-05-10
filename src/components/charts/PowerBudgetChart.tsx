@@ -1,5 +1,5 @@
 import { useTopologyStore } from '../../store/topologyStore';
-import { computePowerBudget, calculatePathLoss } from '../../simulation/opticalBudget';
+import { calculatePathLoss } from '../../simulation/opticalBudget';
 import type { FiberSegment, Splitter, ODF } from '../../types/network';
 
 interface Props { onuId: string | null; }

@@ -3,7 +3,7 @@ import {
   applyNodeChanges, applyEdgeChanges,
   type Node, type Edge, type NodeChange, type EdgeChange, type Connection,
 } from '@xyflow/react';
-import type { OLT, ONU, Splitter, ODF, FiberSegment, SplitterRatio, XYPosition, PONPort } from '../types/network';
+import type { OLT, ONU, Splitter, ODF, FiberSegment, SplitterRatio, XYPosition } from '../types/network';
 import type { DBAProfile } from '../types/protocol';
 import type { ProjectFile } from '../types/topology';
 import { generateId, generateSerialNumber } from '../utils/idGenerator';
@@ -46,17 +46,19 @@ let onuCount = 0;
 let splitterCount = 0;
 let odfCount = 0;
 
+type NodeData = Record<string, unknown>;
+
 function makeOLTNode(olt: OLT): Node {
-  return { id: olt.id, type: 'olt', position: olt.position, data: olt };
+  return { id: olt.id, type: 'olt', position: olt.position, data: olt as unknown as NodeData };
 }
 function makeONUNode(onu: ONU): Node {
-  return { id: onu.id, type: 'onu', position: onu.position, data: onu };
+  return { id: onu.id, type: 'onu', position: onu.position, data: onu as unknown as NodeData };
 }
 function makeSplitterNode(s: Splitter): Node {
-  return { id: s.id, type: 'splitter', position: s.position, data: s };
+  return { id: s.id, type: 'splitter', position: s.position, data: s as unknown as NodeData };
 }
 function makeODFNode(o: ODF): Node {
-  return { id: o.id, type: 'odf', position: o.position, data: o };
+  return { id: o.id, type: 'odf', position: o.position, data: o as unknown as NodeData };
 }
 function makeFiberEdge(f: FiberSegment): Edge {
   return {
@@ -66,7 +68,7 @@ function makeFiberEdge(f: FiberSegment): Edge {
     target: f.targetId,
     targetHandle: f.targetHandle || null,
     type: 'fiber',
-    data: f,
+    data: f as unknown as NodeData,
   };
 }
 
