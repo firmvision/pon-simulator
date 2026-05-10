@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="#0f172a"/>
+  <!-- OLT rack unit -->
+  <rect x="36" y="148" width="80" height="120" rx="10" fill="#1e293b" stroke="#3b82f6" stroke-width="3"/>
+  <rect x="46" y="162" width="60" height="10" rx="2" fill="#1e40af"/>
+  <rect x="46" y="178" width="60" height="10" rx="2" fill="#1e40af"/>
+  <rect x="46" y="194" width="60" height="10" rx="2" fill="#1e40af"/>
+  <circle cx="96" cy="238" r="6" fill="#22c55e"/>
+  <text x="76" y="256" text-anchor="middle" fill="#60a5fa" font-size="18" font-family="monospace" font-weight="bold">OLT</text>
+  <!-- Feeder fiber -->
+  <path d="M116 208 Q200 160 256 208" stroke="#3b82f6" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <!-- Splitter -->
+  <polygon points="256,188 280,212 256,236 232,212" fill="#1d4ed8" stroke="#3b82f6" stroke-width="3"/>
+  <text x="256" y="280" text-anchor="middle" fill="#93c5fd" font-size="16" font-family="monospace">1:8</text>
+  <!-- Drop fibers -->
+  <line x1="256" y1="236" x2="136" y2="360" stroke="#22c55e" stroke-width="5" stroke-linecap="round"/>
+  <line x1="256" y1="236" x2="196" y2="372" stroke="#22c55e" stroke-width="5" stroke-linecap="round"/>
+  <line x1="256" y1="236" x2="256" y2="376" stroke="#22c55e" stroke-width="5" stroke-linecap="round"/>
+  <line x1="256" y1="236" x2="316" y2="372" stroke="#22c55e" stroke-width="5" stroke-linecap="round"/>
+  <line x1="256" y1="236" x2="376" y2="360" stroke="#22c55e" stroke-width="5" stroke-linecap="round"/>
+  <!-- ONU boxes -->
+  <rect x="108" y="356" width="56" height="36" rx="6" fill="#14532d" stroke="#22c55e" stroke-width="2"/>
+  <text x="136" y="378" text-anchor="middle" fill="#86efac" font-size="11" font-family="monospace">ONU</text>
+  <rect x="168" y="368" width="56" height="36" rx="6" fill="#14532d" stroke="#22c55e" stroke-width="2"/>
+  <text x="196" y="390" text-anchor="middle" fill="#86efac" font-size="11" font-family="monospace">ONU</text>
+  <rect x="228" y="372" width="56" height="36" rx="6" fill="#14532d" stroke="#22c55e" stroke-width="2"/>
+  <text x="256" y="394" text-anchor="middle" fill="#86efac" font-size="11" font-family="monospace">ONU</text>
+  <rect x="288" y="368" width="56" height="36" rx="6" fill="#14532d" stroke="#22c55e" stroke-width="2"/>
+  <text x="316" y="390" text-anchor="middle" fill="#86efac" font-size="11" font-family="monospace">ONU</text>
+  <rect x="348" y="356" width="56" height="36" rx="6" fill="#14532d" stroke="#22c55e" stroke-width="2"/>
+  <text x="376" y="378" text-anchor="middle" fill="#86efac" font-size="11" font-family="monospace">ONU</text>
+  <!-- Glow ring around splitter -->
+  <circle cx="256" cy="212" r="44" fill="none" stroke="#3b82f6" stroke-width="1.5" stroke-opacity="0.25"/>
+  <!-- Title -->
+  <text x="390" y="172" text-anchor="middle" fill="#475569" font-size="13" font-family="monospace">PON</text>
+  <text x="390" y="188" text-anchor="middle" fill="#60a5fa" font-size="13" font-family="monospace">SIM</text>
+</svg>
