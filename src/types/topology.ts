@@ -1,4 +1,4 @@
-import type { OLT, ONU, Splitter, ODF, FiberSegment } from './network';
+import type { OLT, ONU, Splitter, ODF, FiberSegment, EndDevice, EthernetLink } from './network';
 import type { DBAProfile } from './protocol';
 
 export interface ProjectFile {
@@ -15,6 +15,8 @@ export interface ProjectFile {
   splitters: Splitter[];
   odfs: ODF[];
   fibers: FiberSegment[];
+  endDevices: EndDevice[];
+  ethernetLinks: EthernetLink[];
   dbaProfiles: DBAProfile[];
   viewport: { x: number; y: number; zoom: number };
 }

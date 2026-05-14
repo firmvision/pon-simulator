@@ -45,6 +45,26 @@ export interface TrafficFlow {
   utilization: number;
 }
 
+export type CaptureProtocol = 'PLOAM' | 'OMCI' | 'GEM' | 'Ethernet' | 'IPv4' | 'ARP' | 'DBA' | 'ICMP' | 'UDP' | 'TCP';
+
+export interface FrameField {
+  name: string;
+  value: string;
+  bytes: string;
+}
+
+export interface CaptureFrame {
+  no: number;
+  simTime_ms: number;
+  source: string;
+  destination: string;
+  protocol: CaptureProtocol;
+  length: number;
+  info: string;
+  direction: 'upstream' | 'downstream' | 'both';
+  detail: FrameField[];
+}
+
 export interface SimulationState {
   running: boolean;
   simTimestamp: number;
@@ -52,4 +72,6 @@ export interface SimulationState {
   events: SimEvent[];
   alarms: AlarmRecord[];
   trafficFlows: Record<string, TrafficFlow>;
+  captureFrames: CaptureFrame[];
+  captureRunning: boolean;
 }

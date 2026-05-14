@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { SimEvent, AlarmRecord, TrafficFlow, SimulationState } from '../types/simulation';
+import type { SimEvent, AlarmRecord, TrafficFlow, SimulationState, CaptureFrame } from '../types/simulation';
 import { generateId } from '../utils/idGenerator';
 
 interface SimulationStore extends SimulationState {
@@ -14,6 +14,9 @@ interface SimulationStore extends SimulationState {
   updateTrafficFlow: (flow: TrafficFlow) => void;
   removeTrafficFlow: (onuId: string) => void;
   advanceTime: (delta: number) => void;
+  addCaptureFrame: (frame: Omit<CaptureFrame, 'no'>) => void;
+  clearCapture: () => void;
+  toggleCapture: () => void;
 }
 
 export const useSimulationStore = create<SimulationStore>((set, get) => ({
@@ -23,6 +26,8 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
   events: [],
   alarms: [],
   trafficFlows: {},
+  captureFrames: [],
+  captureRunning: true,
 
   startSimulation: () => set({ running: true }),
   pauseSimulation: () => set({ running: false }),
@@ -33,6 +38,7 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
     events: [],
     alarms: [],
     trafficFlows: {},
+    captureFrames: [],
   }),
 
   setSpeed: (multiplier) => set({ speedMultiplier: multiplier }),
@@ -81,4 +87,13 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
     delete trafficFlows[onuId];
     return { trafficFlows };
   }),
+
+  addCaptureFrame: (frame) => set(s => {
+    if (!s.captureRunning) return {};
+    const no = s.captureFrames.length + 1;
+    return { captureFrames: [...s.captureFrames, { ...frame, no }].slice(-2000) };
+  }),
+
+  clearCapture: () => set({ captureFrames: [] }),
+  toggleCapture: () => set(s => ({ captureRunning: !s.captureRunning })),
 }));

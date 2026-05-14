@@ -4,6 +4,8 @@ import { DEFAULT_DBA_PROFILES } from '../types/protocol';
 const gponSimple: ProjectFile = {
   version: '1.0',
   metadata: { name: 'Simple GPON', description: '1 OLT, 1:8 splitter, 8 ONUs — starter topology', author: 'Demo', createdAt: '', modifiedAt: '' },
+  endDevices: [],
+  ethernetLinks: [],
   dbaProfiles: DEFAULT_DBA_PROFILES,
   olts: [{
     id: 'olt-demo', label: 'OLT-1', vendor: 'Huawei', model: 'MA5800-X17',
@@ -48,6 +50,8 @@ const gponSimple: ProjectFile = {
 const xgsPonEnterprise: ProjectFile = {
   version: '1.0',
   metadata: { name: 'XGS-PON Enterprise', description: '1 OLT, 1:16 splitter, 16 business ONUs with Type 1+4 T-CONTs', author: 'Demo', createdAt: '', modifiedAt: '' },
+  endDevices: [],
+  ethernetLinks: [],
   dbaProfiles: DEFAULT_DBA_PROFILES,
   olts: [{
     id: 'olt-xgs', label: 'OLT-1', vendor: 'Nokia', model: 'ISAM FX-4',
@@ -97,6 +101,8 @@ const xgsPonEnterprise: ProjectFile = {
 const cascadedSplitter: ProjectFile = {
   version: '1.0',
   metadata: { name: 'Cascaded Splitter', description: '2-stage ODN: OLT → 1:4 → 2×(1:4) → 8 ONUs — real-world cascaded architecture', author: 'Demo', createdAt: '', modifiedAt: '' },
+  endDevices: [],
+  ethernetLinks: [],
   dbaProfiles: DEFAULT_DBA_PROFILES,
   olts: [{
     id: 'olt-cas', label: 'OLT-1', vendor: 'Huawei', model: 'MA5800-X7',
@@ -174,6 +180,8 @@ const cascadedSplitter: ProjectFile = {
 const budgetChallenge: ProjectFile = {
   version: '1.0',
   metadata: { name: 'Budget Challenge', description: 'OLT (TX=+1 dBm) → 10 km feeder → 1:32 → ONUs with varying drop lengths (green/amber/red)', author: 'Demo', createdAt: '', modifiedAt: '' },
+  endDevices: [],
+  ethernetLinks: [],
   dbaProfiles: DEFAULT_DBA_PROFILES,
   olts: [{
     id: 'olt-bgt', label: 'OLT-Budget', vendor: 'ZTE', model: 'C600',
@@ -267,6 +275,8 @@ const budgetChallenge: ProjectFile = {
 const ftthMdu: ProjectFile = {
   version: '1.0',
   metadata: { name: 'FTTH MDU', description: 'Apartment building: OLT → ODF → 1:16 → 12 flats with mixed HSI/VoIP/IPTV services', author: 'Demo', createdAt: '', modifiedAt: '' },
+  endDevices: [],
+  ethernetLinks: [],
   dbaProfiles: DEFAULT_DBA_PROFILES,
   olts: [{
     id: 'olt-mdu', label: 'OLT-MDU', vendor: 'Huawei', model: 'MA5800-X2',

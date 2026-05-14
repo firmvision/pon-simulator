@@ -95,6 +95,27 @@ export interface ODF {
   position: XYPosition;
 }
 
+export type EndDeviceType = 'pc' | 'laptop' | 'router' | 'server' | 'cloud' | 'phone';
+
+export interface EndDevice {
+  id: string;
+  label: string;
+  deviceType: EndDeviceType;
+  ipAddress: string;
+  macAddress: string;
+  position: XYPosition;
+}
+
+export interface EthernetLink {
+  id: string;
+  sourceId: string;
+  sourceHandle: string;
+  targetId: string;
+  targetHandle: string;
+  speedMbps: 100 | 1000 | 10000;
+  trafficActive?: boolean;
+}
+
 export interface FiberSegment {
   id: string;
   sourceId: string;

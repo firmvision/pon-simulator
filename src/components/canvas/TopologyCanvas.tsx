@@ -10,18 +10,22 @@ import { OLTNode } from '../../nodes/OLTNode';
 import { ONUNode } from '../../nodes/ONUNode';
 import { SplitterNode } from '../../nodes/SplitterNode';
 import { ODFNode } from '../../nodes/ODFNode';
+import { EndDeviceNode } from '../../nodes/EndDeviceNode';
 import { FiberEdge } from '../../edges/FiberEdge';
-import type { SplitterRatio } from '../../types/network';
+import { EthernetEdge } from '../../edges/EthernetEdge';
+import type { SplitterRatio, EndDeviceType } from '../../types/network';
 
 const nodeTypes: NodeTypes = {
   olt: OLTNode as never,
   onu: ONUNode as never,
   splitter: SplitterNode as never,
   odf: ODFNode as never,
+  enddevice: EndDeviceNode as never,
 };
 
 const edgeTypes: EdgeTypes = {
   fiber: FiberEdge as never,
+  ethernet: EthernetEdge as never,
 };
 
 // Use individual selectors to avoid unnecessary re-renders
@@ -35,6 +39,7 @@ const selectAddOLT = (s: ReturnType<typeof useTopologyStore.getState>) => s.addO
 const selectAddONU = (s: ReturnType<typeof useTopologyStore.getState>) => s.addONU;
 const selectAddSplitter = (s: ReturnType<typeof useTopologyStore.getState>) => s.addSplitter;
 const selectAddODF = (s: ReturnType<typeof useTopologyStore.getState>) => s.addODF;
+const selectAddEndDevice = (s: ReturnType<typeof useTopologyStore.getState>) => s.addEndDevice;
 
 type RFInstance = { screenToFlowPosition: (pos: { x: number; y: number }) => { x: number; y: number } };
 
@@ -49,6 +54,7 @@ export function TopologyCanvas() {
   const addONU = useTopologyStore(selectAddONU);
   const addSplitter = useTopologyStore(selectAddSplitter);
   const addODF = useTopologyStore(selectAddODF);
+  const addEndDevice = useTopologyStore(selectAddEndDevice);
 
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const rfInstance = useRef<RFInstance | null>(null);
@@ -70,8 +76,10 @@ export function TopologyCanvas() {
     else if (type.startsWith('splitter-')) {
       const ratio = parseInt(type.split('-')[1]) as SplitterRatio;
       addSplitter(ratio, position);
+    } else if (type.startsWith('dev-')) {
+      addEndDevice(type.replace('dev-', '') as EndDeviceType, position);
     }
-  }, [addOLT, addONU, addSplitter, addODF]);
+  }, [addOLT, addONU, addSplitter, addODF, addEndDevice]);
 
   const onDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();

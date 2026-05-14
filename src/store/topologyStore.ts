@@ -3,7 +3,7 @@ import {
   applyNodeChanges, applyEdgeChanges,
   type Node, type Edge, type NodeChange, type EdgeChange, type Connection,
 } from '@xyflow/react';
-import type { OLT, ONU, Splitter, ODF, FiberSegment, SplitterRatio, XYPosition } from '../types/network';
+import type { OLT, ONU, Splitter, ODF, FiberSegment, SplitterRatio, XYPosition, EndDevice, EndDeviceType, EthernetLink } from '../types/network';
 import type { DBAProfile } from '../types/protocol';
 import type { ProjectFile } from '../types/topology';
 import { generateId, generateSerialNumber } from '../utils/idGenerator';
@@ -17,6 +17,8 @@ interface TopologyStore {
   splitters: Record<string, Splitter>;
   odfs: Record<string, ODF>;
   fibers: Record<string, FiberSegment>;
+  endDevices: Record<string, EndDevice>;
+  ethernetLinks: Record<string, EthernetLink>;
   dbaProfiles: Record<string, DBAProfile>;
   selectedNodeId: string | null;
 
@@ -29,10 +31,12 @@ interface TopologyStore {
   addONU: (position: XYPosition) => string;
   addSplitter: (ratio: SplitterRatio, position: XYPosition) => string;
   addODF: (position: XYPosition) => string;
+  addEndDevice: (deviceType: EndDeviceType, position: XYPosition) => string;
   updateOLT: (id: string, patch: Partial<OLT>) => void;
   updateONU: (id: string, patch: Partial<ONU>) => void;
   updateSplitter: (id: string, patch: Partial<Splitter>) => void;
   updateFiber: (id: string, patch: Partial<FiberSegment>) => void;
+  updateEndDevice: (id: string, patch: Partial<EndDevice>) => void;
   removeNode: (id: string) => void;
   removeEdge: (id: string) => void;
 
@@ -45,6 +49,7 @@ let oltCount = 0;
 let onuCount = 0;
 let splitterCount = 0;
 let odfCount = 0;
+let endDeviceCount = 0;
 
 type NodeData = Record<string, unknown>;
 
@@ -60,6 +65,17 @@ function makeSplitterNode(s: Splitter): Node {
 function makeODFNode(o: ODF): Node {
   return { id: o.id, type: 'odf', position: o.position, data: o as unknown as NodeData };
 }
+function makeEndDeviceNode(d: EndDevice): Node {
+  return { id: d.id, type: 'enddevice', position: d.position, data: d as unknown as NodeData };
+}
+function makeEthernetEdge(l: EthernetLink): Edge {
+  return {
+    id: l.id, source: l.sourceId, sourceHandle: l.sourceHandle || null,
+    target: l.targetId, targetHandle: l.targetHandle || null,
+    type: 'ethernet', data: l as unknown as NodeData,
+  };
+}
+
 function makeFiberEdge(f: FiberSegment): Edge {
   return {
     id: f.id,
@@ -83,47 +99,70 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
   splitters: {},
   odfs: {},
   fibers: {},
+  endDevices: {},
+  ethernetLinks: {},
   dbaProfiles: { ...initialDBAProfiles },
   selectedNodeId: null,
 
   onNodesChange: (changes) => {
-    // Only update nodes array — do NOT sync to domain objects here to avoid infinite loops.
-    // Positions are read from nodes[] at export time.
-    set(s => ({ nodes: applyNodeChanges(changes, s.nodes) }));
+    // Apply node changes, and for 'remove' changes also clean up domain maps + connected edges
+    set(s => {
+      const removedIds = changes.filter(c => c.type === 'remove').map(c => c.id);
+      let olts = s.olts, onus = s.onus, splitters = s.splitters, odfs = s.odfs, endDevices = s.endDevices;
+      let edges = s.edges, fibers = s.fibers, ethernetLinks = s.ethernetLinks;
+      if (removedIds.length > 0) {
+        olts = { ...olts }; onus = { ...onus }; splitters = { ...splitters };
+        odfs = { ...odfs }; endDevices = { ...endDevices };
+        fibers = { ...fibers }; ethernetLinks = { ...ethernetLinks };
+        removedIds.forEach(id => {
+          delete olts[id]; delete onus[id]; delete splitters[id];
+          delete odfs[id]; delete endDevices[id];
+        });
+        // Remove connected edges and their domain records
+        const deadEdges = edges.filter(e => removedIds.includes(e.source) || removedIds.includes(e.target));
+        deadEdges.forEach(e => { delete fibers[e.id]; delete ethernetLinks[e.id]; });
+        edges = edges.filter(e => !removedIds.includes(e.source) && !removedIds.includes(e.target));
+      }
+      return {
+        nodes: applyNodeChanges(changes, s.nodes),
+        olts, onus, splitters, odfs, endDevices, edges, fibers, ethernetLinks,
+      };
+    });
   },
 
   onEdgesChange: (changes) => {
-    set(s => ({ edges: applyEdgeChanges(changes, s.edges) }));
-    changes.forEach(c => {
-      if (c.type === 'remove') {
-        set(s => {
-          const fibers = { ...s.fibers };
-          delete fibers[c.id];
-          return { fibers };
-        });
-      }
+    set(s => {
+      const removedIds = changes.filter(c => c.type === 'remove').map(c => c.id);
+      const fibers = { ...s.fibers };
+      const ethernetLinks = { ...s.ethernetLinks };
+      removedIds.forEach(id => { delete fibers[id]; delete ethernetLinks[id]; });
+      return { edges: applyEdgeChanges(changes, s.edges), fibers, ethernetLinks };
     });
   },
 
   onConnect: (connection) => {
-    const id = generateId('fiber');
-    const fiber: FiberSegment = {
-      id,
-      sourceId: connection.source,
-      sourceHandle: connection.sourceHandle || '',
-      targetId: connection.target,
-      targetHandle: connection.targetHandle || '',
-      lengthKm: 1,
-      attenuationCoeff_dBpkm: 0.35,
-      connectorCount: 2,
-      spliceCount: 0,
-      connectorLoss_dB: 0.5,
-      spliceLoss_dB: 0.1,
-    };
-    set(s => ({
-      fibers: { ...s.fibers, [id]: fiber },
-      edges: [...s.edges, makeFiberEdge(fiber)],
-    }));
+    const s = get();
+    const srcIsEndDevice = !!s.endDevices[connection.source];
+    const tgtIsEndDevice = !!s.endDevices[connection.target];
+    if (srcIsEndDevice || tgtIsEndDevice) {
+      // Ethernet link between end device and ONU/router
+      const id = generateId('eth');
+      const link: EthernetLink = {
+        id, sourceId: connection.source, sourceHandle: connection.sourceHandle || '',
+        targetId: connection.target, targetHandle: connection.targetHandle || '',
+        speedMbps: 1000,
+      };
+      set(st => ({ ethernetLinks: { ...st.ethernetLinks, [id]: link }, edges: [...st.edges, makeEthernetEdge(link)] }));
+    } else {
+      const id = generateId('fiber');
+      const fiber: FiberSegment = {
+        id, sourceId: connection.source, sourceHandle: connection.sourceHandle || '',
+        targetId: connection.target, targetHandle: connection.targetHandle || '',
+        lengthKm: 1, attenuationCoeff_dBpkm: 0.35,
+        connectorCount: 2, spliceCount: 0, connectorLoss_dB: 0.5, spliceLoss_dB: 0.1,
+      };
+      set(st => ({ fibers: { ...st.fibers, [id]: fiber }, edges: [...st.edges, makeFiberEdge(fiber)] }));
+    }
   },
 
   setSelectedNode: (id) => set({ selectedNodeId: id }),
@@ -225,6 +264,20 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
     return id;
   },
 
+  addEndDevice: (deviceType, position) => {
+    const id = generateId('dev');
+    const n = ++endDeviceCount;
+    const labels: Record<string, string> = { pc: 'PC', laptop: 'Laptop', router: 'Router', server: 'Server', cloud: 'Internet', phone: 'Phone' };
+    const octets = [192, 168, 1, n % 254 || 1];
+    const mac = Array.from({ length: 6 }, (_, i) => ((n * 7 + i * 13) & 0xff).toString(16).padStart(2, '0')).join(':');
+    const dev: EndDevice = {
+      id, label: `${labels[deviceType] ?? 'Device'}-${n}`,
+      deviceType, ipAddress: octets.join('.'), macAddress: mac, position,
+    };
+    set(s => ({ endDevices: { ...s.endDevices, [id]: dev }, nodes: [...s.nodes, makeEndDeviceNode(dev)] }));
+    return id;
+  },
+
   addODF: (position) => {
     const id = generateId('odf');
     const odf: ODF = {
@@ -265,6 +318,11 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
     };
   }),
 
+  updateEndDevice: (id, patch) => set(s => {
+    const updated = { ...s.endDevices[id], ...patch };
+    return { endDevices: { ...s.endDevices, [id]: updated }, nodes: s.nodes.map(n => n.id === id ? { ...n, data: updated } : n) };
+  }),
+
   updateFiber: (id, patch) => set(s => {
     const updated = { ...s.fibers[id], ...patch };
     return {
@@ -278,17 +336,20 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
     const onus = { ...s.onus }; delete onus[id];
     const splitters = { ...s.splitters }; delete splitters[id];
     const odfs = { ...s.odfs }; delete odfs[id];
+    const endDevices = { ...s.endDevices }; delete endDevices[id];
     const nodes = s.nodes.filter(n => n.id !== id);
-    const edgesToRemove = s.edges.filter(e => e.source === id || e.target === id).map(e => e.id);
+    const deadEdges = s.edges.filter(e => e.source === id || e.target === id).map(e => e.id);
     const edges = s.edges.filter(e => e.source !== id && e.target !== id);
     const fibers = { ...s.fibers };
-    edgesToRemove.forEach(eid => delete fibers[eid]);
-    return { olts, onus, splitters, odfs, nodes, edges, fibers };
+    const ethernetLinks = { ...s.ethernetLinks };
+    deadEdges.forEach(eid => { delete fibers[eid]; delete ethernetLinks[eid]; });
+    return { olts, onus, splitters, odfs, endDevices, nodes, edges, fibers, ethernetLinks };
   }),
 
   removeEdge: (id) => set(s => {
     const fibers = { ...s.fibers }; delete fibers[id];
-    return { fibers, edges: s.edges.filter(e => e.id !== id) };
+    const ethernetLinks = { ...s.ethernetLinks }; delete ethernetLinks[id];
+    return { fibers, ethernetLinks, edges: s.edges.filter(e => e.id !== id) };
   }),
 
   loadProject: (file) => {
@@ -297,6 +358,8 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
     const splitters: Record<string, Splitter> = {};
     const odfs: Record<string, ODF> = {};
     const fibers: Record<string, FiberSegment> = {};
+    const endDevices: Record<string, EndDevice> = {};
+    const ethernetLinks: Record<string, EthernetLink> = {};
     const dbaProfiles: Record<string, DBAProfile> = { ...initialDBAProfiles };
 
     file.olts.forEach(o => { olts[o.id] = o; });
@@ -304,6 +367,8 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
     file.splitters.forEach(s => { splitters[s.id] = s; });
     file.odfs.forEach(o => { odfs[o.id] = o; });
     file.fibers.forEach(f => { fibers[f.id] = f; });
+    file.endDevices?.forEach(d => { endDevices[d.id] = d; });
+    file.ethernetLinks?.forEach(l => { ethernetLinks[l.id] = l; });
     file.dbaProfiles?.forEach(d => { dbaProfiles[d.id] = d; });
 
     const nodes = [
@@ -311,10 +376,14 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
       ...file.onus.map(makeONUNode),
       ...file.splitters.map(makeSplitterNode),
       ...file.odfs.map(makeODFNode),
+      ...(file.endDevices ?? []).map(makeEndDeviceNode),
     ];
-    const edges = file.fibers.map(makeFiberEdge);
+    const edges = [
+      ...file.fibers.map(makeFiberEdge),
+      ...(file.ethernetLinks ?? []).map(makeEthernetEdge),
+    ];
 
-    set({ olts, onus, splitters, odfs, fibers, dbaProfiles, nodes, edges, selectedNodeId: null });
+    set({ olts, onus, splitters, odfs, fibers, endDevices, ethernetLinks, dbaProfiles, nodes, edges, selectedNodeId: null });
   },
 
   exportProject: () => {
@@ -336,14 +405,16 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
       splitters: Object.values(s.splitters).map(o => ({ ...o, position: positionMap[o.id] ?? o.position })),
       odfs: Object.values(s.odfs).map(o => ({ ...o, position: positionMap[o.id] ?? o.position })),
       fibers: Object.values(s.fibers),
+      endDevices: Object.values(s.endDevices).map(d => ({ ...d, position: positionMap[d.id] ?? d.position })),
+      ethernetLinks: Object.values(s.ethernetLinks),
       dbaProfiles: Object.values(s.dbaProfiles),
       viewport: { x: 0, y: 0, zoom: 1 },
     };
   },
 
   reset: () => {
-    oltCount = 0; onuCount = 0; splitterCount = 0; odfCount = 0;
-    set({ nodes: [], edges: [], olts: {}, onus: {}, splitters: {}, odfs: {}, fibers: {}, selectedNodeId: null, dbaProfiles: { ...initialDBAProfiles } });
+    oltCount = 0; onuCount = 0; splitterCount = 0; odfCount = 0; endDeviceCount = 0;
+    set({ nodes: [], edges: [], olts: {}, onus: {}, splitters: {}, odfs: {}, fibers: {}, endDevices: {}, ethernetLinks: {}, selectedNodeId: null, dbaProfiles: { ...initialDBAProfiles } });
   },
 }));
 

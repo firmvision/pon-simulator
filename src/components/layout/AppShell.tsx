@@ -12,6 +12,7 @@ import { LearningPanel } from '../learning/LearningPanel';
 import { EventLog } from '../log/EventLog';
 import { BandwidthChart } from '../charts/BandwidthChart';
 import { PowerBudgetChart } from '../charts/PowerBudgetChart';
+import { PacketCapture } from '../panels/PacketCapture';
 import { InstallPrompt } from '../pwa/InstallPrompt';
 import { MobileShell } from './MobileShell';
 import { useMobile } from '../../hooks/useMobile';
@@ -96,11 +97,13 @@ export function AppShell() {
           {tabBtn('Event Log', activeBottomPanel === 'eventlog', () => setActiveBottomPanel('eventlog'))}
           {tabBtn('Bandwidth', activeBottomPanel === 'bandwidth', () => setActiveBottomPanel('bandwidth'))}
           {tabBtn('Power Budget', activeBottomPanel === 'powerbudget', () => setActiveBottomPanel('powerbudget'))}
+          {tabBtn('🦈 Capture', activeBottomPanel === 'capture', () => setActiveBottomPanel('capture'))}
         </div>
         <div style={{ flex: 1, overflow: 'auto' }}>
           {activeBottomPanel === 'eventlog' && <EventLog />}
           {activeBottomPanel === 'bandwidth' && <BandwidthChart />}
           {activeBottomPanel === 'powerbudget' && <PowerBudgetChart onuId={selectedOnu} />}
+          {activeBottomPanel === 'capture' && <PacketCapture />}
         </div>
       </div>
 

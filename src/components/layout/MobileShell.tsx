@@ -12,17 +12,22 @@ import { LearningPanel } from '../learning/LearningPanel';
 import { EventLog } from '../log/EventLog';
 import { BandwidthChart } from '../charts/BandwidthChart';
 import { PowerBudgetChart } from '../charts/PowerBudgetChart';
+import { PacketCapture } from '../panels/PacketCapture';
 import { InstallPrompt } from '../pwa/InstallPrompt';
 
-type MobileTab = 'canvas' | 'properties' | 'terminal' | 'learn' | 'log';
+type MobileTab = 'canvas' | 'properties' | 'terminal' | 'learn' | 'log' | 'capture';
 
 const DEVICES = [
-  { type: 'olt',        label: 'OLT',     color: '#1d4ed8' },
-  { type: 'onu',        label: 'ONU',     color: '#22c55e' },
-  { type: 'splitter-8', label: '1:8',     color: '#7c3aed' },
-  { type: 'splitter-16',label: '1:16',    color: '#7c3aed' },
-  { type: 'splitter-32',label: '1:32',    color: '#7c3aed' },
-  { type: 'odf',        label: 'ODF',     color: '#78716c' },
+  { type: 'olt',         label: 'OLT',     color: '#1d4ed8' },
+  { type: 'onu',         label: 'ONU',     color: '#22c55e' },
+  { type: 'splitter-8',  label: '1:8',     color: '#7c3aed' },
+  { type: 'splitter-16', label: '1:16',    color: '#7c3aed' },
+  { type: 'splitter-32', label: '1:32',    color: '#7c3aed' },
+  { type: 'odf',         label: 'ODF',     color: '#78716c' },
+  { type: 'dev-pc',      label: '🖥 PC',   color: '#0891b2' },
+  { type: 'dev-router',  label: '📶 Router',color: '#d97706' },
+  { type: 'dev-server',  label: '🗄 Server',color: '#7c3aed' },
+  { type: 'dev-cloud',   label: '☁️ Cloud', color: '#64748b' },
 ];
 
 export function MobileShell() {
@@ -31,7 +36,7 @@ export function MobileShell() {
   const [showSamples, setShowSamples] = useState(false);
 
   const { running, speedMultiplier, setSpeed } = useSimulationStore();
-  const { exportProject, loadProject, reset, addOLT, addONU, addSplitter, addODF } = useTopologyStore();
+  const { exportProject, loadProject, reset, removeNode, selectedNodeId, addOLT, addONU, addSplitter, addODF, addEndDevice } = useTopologyStore();
   const selectedId = useTopologyStore(s => s.selectedNodeId);
   const onus = useTopologyStore(s => s.onus);
   const selectedOnu = selectedId && onus[selectedId] ? selectedId : null;
@@ -56,6 +61,7 @@ export function MobileShell() {
     else if (type === 'splitter-8') addSplitter(8, { x, y });
     else if (type === 'splitter-16') addSplitter(16, { x, y });
     else if (type === 'splitter-32') addSplitter(32, { x, y });
+    else if (type.startsWith('dev-')) addEndDevice(type.replace('dev-', '') as import('../../types/network').EndDeviceType, { x, y });
     setShowDevices(false);
     setActiveTab('canvas');
   };
@@ -133,6 +139,7 @@ export function MobileShell() {
         {/* File + sample */}
         {simBtn('💾', handleSave, '#94a3b8')}
         {simBtn('📂', handleLoad, '#94a3b8')}
+        {selectedNodeId && simBtn('🗑', () => removeNode(selectedNodeId), '#ef4444')}
         <button onClick={() => { setShowSamples(v => !v); setShowDevices(false); }} style={{
           padding: '5px 8px', background: '#0f2744', border: '1px solid #1d4ed855',
           borderRadius: 5, color: '#60a5fa', cursor: 'pointer', fontSize: 11,
@@ -206,6 +213,12 @@ export function MobileShell() {
           </div>
         )}
 
+        {activeTab === 'capture' && (
+          <div style={{ height: '100%', overflow: 'hidden' }}>
+            <PacketCapture />
+          </div>
+        )}
+
         {activeTab === 'log' && (
           <div style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             {/* Sub-tabs for log section */}
@@ -239,8 +252,9 @@ export function MobileShell() {
       }}>
         {tabBtn('canvas',     '🗺',  'Canvas')}
         {tabBtn('properties', '📋',  'Props')}
-        {tabBtn('terminal',   '💻',  'Terminal')}
+        {tabBtn('terminal',   '💻',  'Term')}
         {tabBtn('learn',      '📚',  'Learn')}
+        {tabBtn('capture',    '🦈',  'Capture')}
         {tabBtn('log',        '📊',  'Charts')}
       </div>
 

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 export type RightPanel = 'properties' | 'terminal' | 'learn';
-export type BottomPanel = 'eventlog' | 'bandwidth' | 'powerbudget';
+export type BottomPanel = 'eventlog' | 'bandwidth' | 'powerbudget' | 'capture';
 
 export interface TerminalLine {
   id: string;
