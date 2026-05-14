@@ -15,8 +15,9 @@ import { BandwidthChart } from '../charts/BandwidthChart';
 import { PowerBudgetChart } from '../charts/PowerBudgetChart';
 import { PacketCapture } from '../panels/PacketCapture';
 import { InstallPrompt } from '../pwa/InstallPrompt';
+import { CertificationPanel } from '../certification/CertificationPanel';
 
-type MobileTab = 'canvas' | 'properties' | 'terminal' | 'learn' | 'log' | 'capture';
+type MobileTab = 'canvas' | 'properties' | 'terminal' | 'learn' | 'log' | 'capture' | 'cert';
 
 const DEVICES = [
   { type: 'olt',              label: 'OLT',          color: '#1d4ed8' },
@@ -246,6 +247,12 @@ export function MobileShell() {
           </div>
         )}
 
+        {activeTab === 'cert' && (
+          <div style={{ height: '100%', overflow: 'hidden' }}>
+            <CertificationPanel />
+          </div>
+        )}
+
         {activeTab === 'log' && (
           <div style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             {/* Sub-tabs for log section */}
@@ -281,7 +288,7 @@ export function MobileShell() {
         {tabBtn('properties', '📋',  'Props')}
         {tabBtn('terminal',   '💻',  'Term')}
         {tabBtn('learn',      '📚',  'Learn')}
-        {tabBtn('capture',    '🦈',  'Capture')}
+        {tabBtn('cert',       '🎓',  'Cert')}
         {tabBtn('log',        '📊',  'Charts')}
       </div>
 

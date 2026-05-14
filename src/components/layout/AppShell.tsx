@@ -14,6 +14,7 @@ import { BandwidthChart } from '../charts/BandwidthChart';
 import { PowerBudgetChart } from '../charts/PowerBudgetChart';
 import { PacketCapture } from '../panels/PacketCapture';
 import { InstallPrompt } from '../pwa/InstallPrompt';
+import { CertificationPanel } from '../certification/CertificationPanel';
 import { MobileShell } from './MobileShell';
 import { useMobile } from '../../hooks/useMobile';
 
@@ -83,11 +84,13 @@ export function AppShell() {
           {tabBtn('Properties', activeRightPanel === 'properties', () => setActiveRightPanel('properties'))}
           {tabBtn('Terminal', activeRightPanel === 'terminal', () => setActiveRightPanel('terminal'))}
           {tabBtn('📚 Learn', activeRightPanel === 'learn', () => setActiveRightPanel('learn'))}
+          {tabBtn('🎓 Cert', activeRightPanel === 'cert', () => setActiveRightPanel('cert'))}
         </div>
         <div style={{ flex: 1, overflow: 'hidden' }}>
           {activeRightPanel === 'properties' && <PropertiesPanel />}
           {activeRightPanel === 'terminal' && <CliTerminal />}
           {activeRightPanel === 'learn' && <LearningPanel />}
+          {activeRightPanel === 'cert' && <CertificationPanel />}
         </div>
       </div>
 
