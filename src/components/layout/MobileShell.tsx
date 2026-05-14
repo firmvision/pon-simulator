@@ -5,6 +5,7 @@ import { useUIStore } from '../../store/uiStore';
 import { simEngine } from '../../simulation/engine';
 import { saveProjectToFile, loadProjectFromFile } from '../../utils/persistence';
 import { SAMPLE_TOPOLOGIES } from '../../data/sampleTopologies';
+import { downloadGNS3 } from '../../utils/gns3Export';
 import { TopologyCanvas } from '../canvas/TopologyCanvas';
 import { PropertiesPanel } from '../panels/PropertiesPanel';
 import { CliTerminal } from '../terminal/CliTerminal';
@@ -47,6 +48,19 @@ export function MobileShell() {
   const handleReset = () => { simEngine.reset(); useTopologyStore.getState().reset(); };
 
   const handleSave = () => saveProjectToFile(exportProject());
+
+  const handleExportGNS3 = () => {
+    const s = useTopologyStore.getState();
+    downloadGNS3({
+      olts: Object.values(s.olts),
+      onus: Object.values(s.onus),
+      splitters: Object.values(s.splitters),
+      odfs: Object.values(s.odfs),
+      endDevices: Object.values(s.endDevices),
+      fibers: Object.values(s.fibers),
+      ethernetLinks: Object.values(s.ethernetLinks),
+    });
+  };
   const handleLoad = async () => {
     try { const p = await loadProjectFromFile(); reset(); loadProject(p); } catch {}
   };
@@ -124,7 +138,7 @@ export function MobileShell() {
 
         {/* Speed */}
         <div style={{ display: 'flex', gap: 2, flexShrink: 0 }}>
-          {[1, 10, 100].map(s => (
+          {[0.1, 0.25, 1, 10, 100].map(s => (
             <button key={s} onClick={() => setSpeed(s)} style={{
               padding: '3px 6px', background: speedMultiplier === s ? '#1d4ed8' : 'transparent',
               border: `1px solid ${speedMultiplier === s ? '#3b82f6' : '#1e293b'}`,
@@ -139,6 +153,7 @@ export function MobileShell() {
         {/* File + sample */}
         {simBtn('💾', handleSave, '#94a3b8')}
         {simBtn('📂', handleLoad, '#94a3b8')}
+        {simBtn('GNS3', handleExportGNS3, '#f59e0b')}
         {selectedNodeId && simBtn('🗑', () => removeNode(selectedNodeId), '#ef4444')}
         <button onClick={() => { setShowSamples(v => !v); setShowDevices(false); }} style={{
           padding: '5px 8px', background: '#0f2744', border: '1px solid #1d4ed855',

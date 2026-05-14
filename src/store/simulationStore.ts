@@ -3,6 +3,11 @@ import type { SimEvent, AlarmRecord, TrafficFlow, SimulationState, CaptureFrame 
 import { generateId } from '../utils/idGenerator';
 
 interface SimulationStore extends SimulationState {
+  // replay state
+  replayIndex: number;       // -1 = live (not in replay), ≥0 = index into captureFrames
+  replayPlaying: boolean;    // auto-advancing replay
+  replayFps: number;         // replay speed in frames-per-second
+
   startSimulation: () => void;
   pauseSimulation: () => void;
   resetSimulation: () => void;
@@ -17,6 +22,13 @@ interface SimulationStore extends SimulationState {
   addCaptureFrame: (frame: Omit<CaptureFrame, 'no'>) => void;
   clearCapture: () => void;
   toggleCapture: () => void;
+  // replay actions
+  enterReplay: (index?: number) => void;
+  exitReplay: () => void;
+  setReplayIndex: (index: number) => void;
+  stepReplay: (dir: 'forward' | 'backward') => void;
+  toggleReplayPlay: () => void;
+  setReplayFps: (fps: number) => void;
 }
 
 export const useSimulationStore = create<SimulationStore>((set, get) => ({
@@ -28,6 +40,9 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
   trafficFlows: {},
   captureFrames: [],
   captureRunning: true,
+  replayIndex: -1,
+  replayPlaying: false,
+  replayFps: 2,
 
   startSimulation: () => set({ running: true }),
   pauseSimulation: () => set({ running: false }),
@@ -94,6 +109,42 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
     return { captureFrames: [...s.captureFrames, { ...frame, no }].slice(-2000) };
   }),
 
-  clearCapture: () => set({ captureFrames: [] }),
+  clearCapture: () => set({ captureFrames: [], replayIndex: -1, replayPlaying: false }),
   toggleCapture: () => set(s => ({ captureRunning: !s.captureRunning })),
+
+  enterReplay: (index) => {
+    const s = get();
+    const idx = index ?? Math.max(0, s.captureFrames.length - 1);
+    set({ replayIndex: Math.min(idx, s.captureFrames.length - 1), replayPlaying: false });
+  },
+
+  exitReplay: () => set({ replayIndex: -1, replayPlaying: false }),
+
+  setReplayIndex: (index) => {
+    const s = get();
+    const clamped = Math.max(0, Math.min(index, s.captureFrames.length - 1));
+    set({ replayIndex: clamped });
+  },
+
+  stepReplay: (dir) => {
+    const s = get();
+    if (s.captureFrames.length === 0) return;
+    const cur = s.replayIndex < 0 ? s.captureFrames.length - 1 : s.replayIndex;
+    const next = dir === 'forward'
+      ? Math.min(cur + 1, s.captureFrames.length - 1)
+      : Math.max(cur - 1, 0);
+    set({ replayIndex: next, replayPlaying: false });
+  },
+
+  toggleReplayPlay: () => {
+    const s = get();
+    if (!s.replayPlaying && s.replayIndex < 0) {
+      // Start replay from beginning
+      set({ replayIndex: 0, replayPlaying: true });
+    } else {
+      set(st => ({ replayPlaying: !st.replayPlaying }));
+    }
+  },
+
+  setReplayFps: (fps) => set({ replayFps: fps }),
 }));

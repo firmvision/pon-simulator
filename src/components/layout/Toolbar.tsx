@@ -4,6 +4,7 @@ import { useUIStore } from '../../store/uiStore';
 import { simEngine } from '../../simulation/engine';
 import { saveProjectToFile, loadProjectFromFile } from '../../utils/persistence';
 import { SAMPLE_TOPOLOGIES } from '../../data/sampleTopologies';
+import { downloadGNS3 } from '../../utils/gns3Export';
 
 const DEVICES = [
   { type: 'olt',         label: 'OLT',    color: '#1d4ed8', desc: 'Optical Line Terminal' },
@@ -68,6 +69,19 @@ export function Toolbar() {
     }
   };
 
+  const handleExportGNS3 = () => {
+    const s = useTopologyStore.getState();
+    downloadGNS3({
+      olts: Object.values(s.olts),
+      onus: Object.values(s.onus),
+      splitters: Object.values(s.splitters),
+      odfs: Object.values(s.odfs),
+      endDevices: Object.values(s.endDevices),
+      fibers: Object.values(s.fibers),
+      ethernetLinks: Object.values(s.ethernetLinks),
+    });
+  };
+
   const loadSample = (idx: number) => {
     simEngine.reset();
     reset();
@@ -119,6 +133,7 @@ export function Toolbar() {
         {btn('New', handleNew, '#94a3b8')}
         {btn('Open', handleLoad, '#94a3b8')}
         {btn('Save', handleSave, '#94a3b8')}
+        {btn('GNS3↗', handleExportGNS3, '#f59e0b')}
       </div>
 
       {/* Examples dropdown (static buttons) */}
@@ -151,7 +166,7 @@ export function Toolbar() {
         {/* Speed selector */}
         <div style={{ display: 'flex', gap: 2, alignItems: 'center' }}>
           <span style={{ color: '#475569', fontSize: 9 }}>Speed:</span>
-          {[1, 5, 10, 100].map(s => (
+          {[0.1, 0.25, 1, 5, 10, 100].map(s => (
             <button key={s} onClick={() => setSpeed(s)} style={{
               padding: '2px 6px', background: speedMultiplier === s ? '#1d4ed8' : 'transparent',
               border: `1px solid ${speedMultiplier === s ? '#3b82f6' : '#1e293b'}`,
