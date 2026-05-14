@@ -21,11 +21,13 @@ interface TopologyStore {
   ethernetLinks: Record<string, EthernetLink>;
   dbaProfiles: Record<string, DBAProfile>;
   selectedNodeId: string | null;
+  selectedEdgeId: string | null;
 
   onNodesChange: (changes: NodeChange[]) => void;
   onEdgesChange: (changes: EdgeChange[]) => void;
   onConnect: (connection: Connection) => void;
   setSelectedNode: (id: string | null) => void;
+  setSelectedEdge: (id: string | null) => void;
 
   addOLT: (position: XYPosition) => string;
   addONU: (position: XYPosition) => string;
@@ -103,6 +105,7 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
   ethernetLinks: {},
   dbaProfiles: { ...initialDBAProfiles },
   selectedNodeId: null,
+  selectedEdgeId: null,
 
   onNodesChange: (changes) => {
     // Apply node changes, and for 'remove' changes also clean up domain maps + connected edges
@@ -144,15 +147,28 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
     const s = get();
     const srcIsEndDevice = !!s.endDevices[connection.source];
     const tgtIsEndDevice = !!s.endDevices[connection.target];
+    const srcDev = s.endDevices[connection.source];
+    const tgtDev = s.endDevices[connection.target];
+
+    const isWireless =
+      (srcDev?.deviceType === 'wifi-ap' || tgtDev?.deviceType === 'wifi-ap') &&
+      ((['wifi-client', 'phone', 'laptop'] as string[]).includes(srcDev?.deviceType ?? '') ||
+       (['wifi-client', 'phone', 'laptop'] as string[]).includes(tgtDev?.deviceType ?? ''));
+
     if (srcIsEndDevice || tgtIsEndDevice) {
-      // Ethernet link between end device and ONU/router
       const id = generateId('eth');
       const link: EthernetLink = {
         id, sourceId: connection.source, sourceHandle: connection.sourceHandle || '',
         targetId: connection.target, targetHandle: connection.targetHandle || '',
         speedMbps: 1000,
       };
-      set(st => ({ ethernetLinks: { ...st.ethernetLinks, [id]: link }, edges: [...st.edges, makeEthernetEdge(link)] }));
+      const edgeType = isWireless ? 'wireless' : 'ethernet';
+      const edge: Edge = {
+        id: link.id, source: link.sourceId, sourceHandle: link.sourceHandle || null,
+        target: link.targetId, targetHandle: link.targetHandle || null,
+        type: edgeType, data: link as unknown as Record<string, unknown>,
+      };
+      set(st => ({ ethernetLinks: { ...st.ethernetLinks, [id]: link }, edges: [...st.edges, edge] }));
     } else {
       const id = generateId('fiber');
       const fiber: FiberSegment = {
@@ -166,6 +182,7 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
   },
 
   setSelectedNode: (id) => set({ selectedNodeId: id }),
+  setSelectedEdge: (id) => set({ selectedEdgeId: id }),
 
   addOLT: (position) => {
     const id = generateId('olt');
@@ -383,7 +400,7 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
       ...(file.ethernetLinks ?? []).map(makeEthernetEdge),
     ];
 
-    set({ olts, onus, splitters, odfs, fibers, endDevices, ethernetLinks, dbaProfiles, nodes, edges, selectedNodeId: null });
+    set({ olts, onus, splitters, odfs, fibers, endDevices, ethernetLinks, dbaProfiles, nodes, edges, selectedNodeId: null, selectedEdgeId: null });
   },
 
   exportProject: () => {
@@ -414,7 +431,7 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
 
   reset: () => {
     oltCount = 0; onuCount = 0; splitterCount = 0; odfCount = 0; endDeviceCount = 0;
-    set({ nodes: [], edges: [], olts: {}, onus: {}, splitters: {}, odfs: {}, fibers: {}, endDevices: {}, ethernetLinks: {}, selectedNodeId: null, dbaProfiles: { ...initialDBAProfiles } });
+    set({ nodes: [], edges: [], olts: {}, onus: {}, splitters: {}, odfs: {}, fibers: {}, endDevices: {}, ethernetLinks: {}, selectedNodeId: null, selectedEdgeId: null, dbaProfiles: { ...initialDBAProfiles } });
   },
 }));
 

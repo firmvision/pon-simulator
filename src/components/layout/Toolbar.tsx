@@ -9,6 +9,8 @@ import { downloadGNS3 } from '../../utils/gns3Export';
 const DEVICES = [
   { type: 'olt',         label: 'OLT',    color: '#1d4ed8', desc: 'Optical Line Terminal' },
   { type: 'onu',         label: 'ONU',    color: '#22c55e', desc: 'Optical Network Unit' },
+  { type: 'splitter-2',  label: '1:2',    color: '#7c3aed', desc: '1:2 Passive Splitter' },
+  { type: 'splitter-4',  label: '1:4',    color: '#7c3aed', desc: '1:4 Passive Splitter' },
   { type: 'splitter-8',  label: '1:8',    color: '#7c3aed', desc: '1:8 Passive Splitter' },
   { type: 'splitter-16', label: '1:16',   color: '#7c3aed', desc: '1:16 Passive Splitter' },
   { type: 'splitter-32', label: '1:32',   color: '#7c3aed', desc: '1:32 Passive Splitter' },
@@ -27,7 +29,7 @@ const END_DEVICES = [
 
 export function Toolbar() {
   const { running, speedMultiplier, setSpeed } = useSimulationStore();
-  const { exportProject, loadProject, reset, removeNode, selectedNodeId } = useTopologyStore();
+  const { exportProject, loadProject, reset, removeNode, selectedNodeId, selectedEdgeId, removeEdge, setSelectedEdge } = useTopologyStore();
   useUIStore();
 
   const onDragStart = (e: React.DragEvent, type: string) => {
@@ -150,13 +152,15 @@ export function Toolbar() {
 
       <div style={{ width: 1, height: 24, background: '#1e293b', flexShrink: 0 }} />
 
-      {/* Delete selected */}
+      {/* Delete selected node */}
       {selectedNodeId && (
         <>
           <div style={{ width: 1, height: 20, background: '#1e293b', flexShrink: 0 }} />
           {btn('🗑 Delete', () => removeNode(selectedNodeId), '#ef4444')}
         </>
       )}
+      {/* Delete selected cable/edge */}
+      {selectedEdgeId && btn('✂ Del Cable', () => { removeEdge(selectedEdgeId); setSelectedEdge(null); }, '#f97316')}
 
       {/* Simulation controls */}
       <div style={{ display: 'flex', gap: 4, alignItems: 'center', flexShrink: 0 }}>

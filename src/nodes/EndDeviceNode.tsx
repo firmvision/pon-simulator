@@ -48,6 +48,35 @@ export const EndDeviceNode = memo(({ data, selected }: NodeProps) => {
   const isAP = dev.deviceType === 'wifi-ap';
 
   return (
+    <div style={{ position: 'relative' }}>
+      {/* WiFi broadcast range rings */}
+      {isAP && (
+        <div style={{
+          position: 'absolute',
+          top: '50%', left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: 120, height: 120,
+          border: `2px dashed ${color}44`,
+          borderRadius: '50%',
+          pointerEvents: 'none',
+          animation: 'wifi-pulse 2s ease-in-out infinite',
+          zIndex: -1,
+        }} />
+      )}
+      {isAP && (
+        <div style={{
+          position: 'absolute',
+          top: '50%', left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: 80, height: 80,
+          border: `1px dashed ${color}33`,
+          borderRadius: '50%',
+          pointerEvents: 'none',
+          animation: 'wifi-pulse 2s ease-in-out infinite',
+          animationDelay: '0.5s',
+          zIndex: -1,
+        }} />
+      )}
     <div style={{
       width: 96, background: '#071520',
       border: `1.5px ${isWireless ? 'dashed' : 'solid'} ${selected ? '#3b82f6' : color + '88'}`,
@@ -119,6 +148,7 @@ export const EndDeviceNode = memo(({ data, selected }: NodeProps) => {
             style={{ bottom: -5, background: color, border: `2px solid ${color}88`, width: 7, height: 7, opacity: 0 }} />
         </>
       )}
+    </div>
     </div>
   );
 });

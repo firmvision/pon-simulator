@@ -43,6 +43,9 @@ export const OLTNode = memo(({ data, selected }: NodeProps) => {
             }} />
           ))}
         </div>
+        <div style={{ color: '#475569', fontSize: 8, marginTop: 3 }}>
+          {olt.ponPorts.length} PON port{olt.ponPorts.length !== 1 ? 's' : ''} · {olt.managementIP}
+        </div>
       </div>
 
       {/* Handles — one per PON port at bottom */}

@@ -65,6 +65,14 @@ export const ONUNode = memo(({ data, selected }: NodeProps) => {
           {marginText && <span style={{ color: marginColor, fontSize: 8 }}>({marginText})</span>}
         </div>
 
+        {/* LAN port indicators */}
+        <div style={{ marginTop: 4, display: 'flex', gap: 2, alignItems: 'center' }}>
+          <span style={{ color: '#334155', fontSize: 7 }}>LAN:</span>
+          {[0, 1, 2, 3].map(i => (
+            <div key={i} style={{ width: 6, height: 6, borderRadius: 1, background: '#0891b2', border: '1px solid #0e749033', opacity: 0.6 }} />
+          ))}
+        </div>
+
         {/* Traffic indicator */}
         {isOp && flow && (
           <div style={{ marginTop: 3, display: 'flex', gap: 3, alignItems: 'center' }}>

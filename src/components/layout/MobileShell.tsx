@@ -21,6 +21,8 @@ type MobileTab = 'canvas' | 'properties' | 'terminal' | 'learn' | 'log' | 'captu
 const DEVICES = [
   { type: 'olt',              label: 'OLT',          color: '#1d4ed8' },
   { type: 'onu',              label: 'ONU',          color: '#22c55e' },
+  { type: 'splitter-2',       label: '1:2',          color: '#7c3aed' },
+  { type: 'splitter-4',       label: '1:4',          color: '#7c3aed' },
   { type: 'splitter-8',       label: '1:8',          color: '#7c3aed' },
   { type: 'splitter-16',      label: '1:16',         color: '#7c3aed' },
   { type: 'splitter-32',      label: '1:32',         color: '#7c3aed' },
@@ -42,6 +44,9 @@ export function MobileShell() {
 
   const { running, speedMultiplier, setSpeed } = useSimulationStore();
   const { exportProject, loadProject, reset, removeNode, selectedNodeId, addOLT, addONU, addSplitter, addODF, addEndDevice } = useTopologyStore();
+  const selectedEdgeId = useTopologyStore(s => s.selectedEdgeId);
+  const removeEdge = useTopologyStore(s => s.removeEdge);
+  const setSelectedEdge = useTopologyStore(s => s.setSelectedEdge);
   const selectedId = useTopologyStore(s => s.selectedNodeId);
   const onus = useTopologyStore(s => s.onus);
   const selectedOnu = selectedId && onus[selectedId] ? selectedId : null;
@@ -76,6 +81,8 @@ export function MobileShell() {
     if (type === 'olt') addOLT({ x, y });
     else if (type === 'onu') addONU({ x, y });
     else if (type === 'odf') addODF({ x, y });
+    else if (type === 'splitter-2') addSplitter(2, { x, y });
+    else if (type === 'splitter-4') addSplitter(4, { x, y });
     else if (type === 'splitter-8') addSplitter(8, { x, y });
     else if (type === 'splitter-16') addSplitter(16, { x, y });
     else if (type === 'splitter-32') addSplitter(32, { x, y });
@@ -159,6 +166,7 @@ export function MobileShell() {
         {simBtn('📂', handleLoad, '#94a3b8')}
         {simBtn('GNS3', handleExportGNS3, '#f59e0b')}
         {selectedNodeId && simBtn('🗑', () => removeNode(selectedNodeId), '#ef4444')}
+        {selectedEdgeId && simBtn('✂', () => { removeEdge(selectedEdgeId); setSelectedEdge(null); }, '#f97316')}
         <button onClick={() => { setShowSamples(v => !v); setShowDevices(false); }} style={{
           padding: '5px 8px', background: '#0f2744', border: '1px solid #1d4ed855',
           borderRadius: 5, color: '#60a5fa', cursor: 'pointer', fontSize: 11,

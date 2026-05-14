@@ -54,6 +54,12 @@
 .fiber-traffic-down { animation: flow-down 0.5s linear infinite; }
 .fiber-traffic-up { animation: flow-up 0.5s linear infinite; }
 
+/* WiFi AP broadcast ring pulse */
+@keyframes wifi-pulse {
+  0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 0.15; transform: translate(-50%, -50%) scale(1.15); }
+}
+
 /* Terminal */
 .terminal-wrap { background: #0c0c0c; font-family: 'Consolas', monospace; font-size: 12px; }
 .term-output { color: #94a3b8; }

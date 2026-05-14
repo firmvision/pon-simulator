@@ -13,6 +13,7 @@ import { ODFNode } from '../../nodes/ODFNode';
 import { EndDeviceNode } from '../../nodes/EndDeviceNode';
 import { FiberEdge } from '../../edges/FiberEdge';
 import { EthernetEdge } from '../../edges/EthernetEdge';
+import { WirelessEdge } from '../../edges/WirelessEdge';
 import type { SplitterRatio, EndDeviceType } from '../../types/network';
 
 const nodeTypes: NodeTypes = {
@@ -26,6 +27,7 @@ const nodeTypes: NodeTypes = {
 const edgeTypes: EdgeTypes = {
   fiber: FiberEdge as never,
   ethernet: EthernetEdge as never,
+  wireless: WirelessEdge as never,
 };
 
 // Use individual selectors to avoid unnecessary re-renders
@@ -35,6 +37,7 @@ const selectOnNodesChange = (s: ReturnType<typeof useTopologyStore.getState>) =>
 const selectOnEdgesChange = (s: ReturnType<typeof useTopologyStore.getState>) => s.onEdgesChange;
 const selectOnConnect = (s: ReturnType<typeof useTopologyStore.getState>) => s.onConnect;
 const selectSetSelectedNode = (s: ReturnType<typeof useTopologyStore.getState>) => s.setSelectedNode;
+const selectSetSelectedEdge = (s: ReturnType<typeof useTopologyStore.getState>) => s.setSelectedEdge;
 const selectAddOLT = (s: ReturnType<typeof useTopologyStore.getState>) => s.addOLT;
 const selectAddONU = (s: ReturnType<typeof useTopologyStore.getState>) => s.addONU;
 const selectAddSplitter = (s: ReturnType<typeof useTopologyStore.getState>) => s.addSplitter;
@@ -50,6 +53,7 @@ export function TopologyCanvas() {
   const onEdgesChange = useTopologyStore(selectOnEdgesChange);
   const onConnect = useTopologyStore(selectOnConnect);
   const setSelectedNode = useTopologyStore(selectSetSelectedNode);
+  const setSelectedEdge = useTopologyStore(selectSetSelectedEdge);
   const addOLT = useTopologyStore(selectAddOLT);
   const addONU = useTopologyStore(selectAddONU);
   const addSplitter = useTopologyStore(selectAddSplitter);
@@ -88,15 +92,18 @@ export function TopologyCanvas() {
 
   const onNodeClick = useCallback((_: unknown, node: { id: string }) => {
     setSelectedNode(node.id);
-  }, [setSelectedNode]);
+    setSelectedEdge(null);
+  }, [setSelectedNode, setSelectedEdge]);
 
   const onEdgeClick = useCallback((_: unknown, edge: { id: string }) => {
-    setSelectedNode(edge.id);
-  }, [setSelectedNode]);
+    setSelectedNode(null);
+    setSelectedEdge(edge.id);
+  }, [setSelectedNode, setSelectedEdge]);
 
   const onPaneClick = useCallback(() => {
     setSelectedNode(null);
-  }, [setSelectedNode]);
+    setSelectedEdge(null);
+  }, [setSelectedNode, setSelectedEdge]);
 
   return (
     <div ref={reactFlowWrapper} style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
