@@ -248,7 +248,7 @@ export function MobileShell() {
         )}
 
         {activeTab === 'cert' && (
-          <div style={{ height: '100%', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', inset: 0, overflowY: 'auto' }}>
             <CertificationPanel />
           </div>
         )}

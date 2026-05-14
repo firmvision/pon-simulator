@@ -86,11 +86,15 @@ export function AppShell() {
           {tabBtn('📚 Learn', activeRightPanel === 'learn', () => setActiveRightPanel('learn'))}
           {tabBtn('🎓 Cert', activeRightPanel === 'cert', () => setActiveRightPanel('cert'))}
         </div>
-        <div style={{ flex: 1, overflow: 'hidden' }}>
+        <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
           {activeRightPanel === 'properties' && <PropertiesPanel />}
           {activeRightPanel === 'terminal' && <CliTerminal />}
           {activeRightPanel === 'learn' && <LearningPanel />}
-          {activeRightPanel === 'cert' && <CertificationPanel />}
+          {activeRightPanel === 'cert' && (
+            <div style={{ position: 'absolute', inset: 0, overflowY: 'auto' }}>
+              <CertificationPanel />
+            </div>
+          )}
         </div>
       </div>
 
