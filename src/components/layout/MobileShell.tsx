@@ -19,16 +19,20 @@ import { InstallPrompt } from '../pwa/InstallPrompt';
 type MobileTab = 'canvas' | 'properties' | 'terminal' | 'learn' | 'log' | 'capture';
 
 const DEVICES = [
-  { type: 'olt',         label: 'OLT',     color: '#1d4ed8' },
-  { type: 'onu',         label: 'ONU',     color: '#22c55e' },
-  { type: 'splitter-8',  label: '1:8',     color: '#7c3aed' },
-  { type: 'splitter-16', label: '1:16',    color: '#7c3aed' },
-  { type: 'splitter-32', label: '1:32',    color: '#7c3aed' },
-  { type: 'odf',         label: 'ODF',     color: '#78716c' },
-  { type: 'dev-pc',      label: '🖥 PC',   color: '#0891b2' },
-  { type: 'dev-router',  label: '📶 Router',color: '#d97706' },
-  { type: 'dev-server',  label: '🗄 Server',color: '#7c3aed' },
-  { type: 'dev-cloud',   label: '☁️ Cloud', color: '#64748b' },
+  { type: 'olt',              label: 'OLT',          color: '#1d4ed8' },
+  { type: 'onu',              label: 'ONU',          color: '#22c55e' },
+  { type: 'splitter-8',       label: '1:8',          color: '#7c3aed' },
+  { type: 'splitter-16',      label: '1:16',         color: '#7c3aed' },
+  { type: 'splitter-32',      label: '1:32',         color: '#7c3aed' },
+  { type: 'odf',              label: 'ODF',          color: '#78716c' },
+  { type: 'dev-pc',           label: '🖥 PC',        color: '#0891b2' },
+  { type: 'dev-laptop',       label: '💻 Laptop',    color: '#0891b2' },
+  { type: 'dev-router',       label: '📶 Router',    color: '#d97706' },
+  { type: 'dev-server',       label: '🗄 Server',    color: '#7c3aed' },
+  { type: 'dev-cloud',        label: '☁️ Cloud',     color: '#64748b' },
+  { type: 'dev-phone',        label: '📱 Phone',     color: '#0891b2' },
+  { type: 'dev-wifi-ap',      label: '📡 WiFi AP',   color: '#10b981' },
+  { type: 'dev-wifi-client',  label: '📲 WiFi Client',color: '#06b6d4' },
 ];
 
 export function MobileShell() {

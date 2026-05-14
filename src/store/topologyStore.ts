@@ -267,7 +267,7 @@ export const useTopologyStore = create<TopologyStore>((set, get) => ({
   addEndDevice: (deviceType, position) => {
     const id = generateId('dev');
     const n = ++endDeviceCount;
-    const labels: Record<string, string> = { pc: 'PC', laptop: 'Laptop', router: 'Router', server: 'Server', cloud: 'Internet', phone: 'Phone' };
+    const labels: Record<string, string> = { pc: 'PC', laptop: 'Laptop', router: 'Router', server: 'Server', cloud: 'Internet', phone: 'Phone', 'wifi-ap': 'AP', 'wifi-client': 'WiFiCli' };
     const octets = [192, 168, 1, n % 254 || 1];
     const mac = Array.from({ length: 6 }, (_, i) => ((n * 7 + i * 13) & 0xff).toString(16).padStart(2, '0')).join(':');
     const dev: EndDevice = {

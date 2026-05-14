@@ -18,6 +18,7 @@ interface UIStore {
   terminalHistory: string[];
   activeModuleId: string;
   moduleSubTab: ModuleSubTab;
+  terminalContext: string | null;   // device id currently being "SSHed into"
   setActiveRightPanel: (panel: RightPanel) => void;
   setActiveBottomPanel: (panel: BottomPanel) => void;
   appendTerminalLine: (line: Omit<TerminalLine, 'id'>) => void;
@@ -25,6 +26,7 @@ interface UIStore {
   clearTerminal: () => void;
   setActiveModule: (id: string) => void;
   setModuleSubTab: (tab: ModuleSubTab) => void;
+  setTerminalContext: (id: string | null) => void;
 }
 
 let lineId = 0;
@@ -34,6 +36,7 @@ export const useUIStore = create<UIStore>((set) => ({
   activeBottomPanel: 'eventlog',
   activeModuleId: 'pon-fundamentals',
   moduleSubTab: 'theory',
+  terminalContext: null,
   terminalLines: [
     { id: 'w0', text: '────────────────────────────────────────', type: 'output' },
     { id: 'w1', text: '  PON Network Simulator — OLT Terminal  ', type: 'info' },
@@ -58,4 +61,5 @@ export const useUIStore = create<UIStore>((set) => ({
   clearTerminal: () => set({ terminalLines: [] }),
   setActiveModule: (id) => set({ activeModuleId: id, moduleSubTab: 'theory' }),
   setModuleSubTab: (tab) => set({ moduleSubTab: tab }),
+  setTerminalContext: (id) => set({ terminalContext: id }),
 }));

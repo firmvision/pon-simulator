@@ -2,7 +2,7 @@ import { useCallback, useRef } from 'react';
 import {
   ReactFlow, Background, Controls, MiniMap,
   type NodeTypes, type EdgeTypes,
-  BackgroundVariant,
+  BackgroundVariant, ConnectionMode,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { useTopologyStore } from '../../store/topologyStore';
@@ -116,6 +116,7 @@ export function TopologyCanvas() {
         onInit={(instance) => { rfInstance.current = instance as RFInstance; }}
         fitView
         deleteKeyCode="Delete"
+        connectionMode={ConnectionMode.Loose}
         connectionLineStyle={{ stroke: '#3b82f6', strokeWidth: 2 }}
         defaultEdgeOptions={{ type: 'fiber' }}
       >

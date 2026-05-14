@@ -23,8 +23,10 @@ export const ONUNode = memo(({ data, selected }: NodeProps) => {
       className={`pon-node${selected ? ' selected' : ''}${isRanging ? ' onu-ranging' : ''}${hasAlarm ? ' has-alarm' : ''}`}
       style={{ width: 130, borderColor: hasAlarm ? '#ef4444' : selected ? '#3b82f6' : stateColor + '88' }}
     >
-      {/* Handle (input from splitter/OLT) */}
+      {/* PON uplink handle (fiber from splitter/OLT) */}
       <Handle type="target" position={Position.Top} id="pon-in" style={{ top: -5, background: stateColor, border: `2px solid ${stateColor}88`, width: 10, height: 10 }} />
+      {/* Also allow source connections from top (for reverse path) */}
+      <Handle type="source" position={Position.Top} id="pon-out" style={{ top: -5, background: stateColor, border: `2px solid ${stateColor}88`, width: 10, height: 10, opacity: 0 }} />
 
       {/* Header */}
       <div style={{
@@ -84,6 +86,17 @@ export const ONUNode = memo(({ data, selected }: NodeProps) => {
         background: stateColor,
         boxShadow: isOp ? `0 0 6px ${stateColor}` : 'none',
       }} />
+
+      {/* LAN port handles at bottom (for connecting end devices) */}
+      {['lan-0','lan-1','lan-2','lan-3'].map((id, i) => (
+        <Handle key={id} type="source" position={Position.Bottom} id={id}
+          style={{ left: `${20 + i * 20}%`, bottom: -5, background: '#0891b2', border: '2px solid #0e7490', width: 8, height: 8 }} />
+      ))}
+      {/* Also accept incoming connections from end devices */}
+      {['lan-in-0','lan-in-1','lan-in-2','lan-in-3'].map((id, i) => (
+        <Handle key={id} type="target" position={Position.Bottom} id={id}
+          style={{ left: `${20 + i * 20}%`, bottom: -5, background: '#0891b2', border: '2px solid #0e7490', width: 8, height: 8, opacity: 0 }} />
+      ))}
     </div>
   );
 });

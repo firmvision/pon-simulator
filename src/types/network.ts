@@ -95,7 +95,7 @@ export interface ODF {
   position: XYPosition;
 }
 
-export type EndDeviceType = 'pc' | 'laptop' | 'router' | 'server' | 'cloud' | 'phone';
+export type EndDeviceType = 'pc' | 'laptop' | 'router' | 'server' | 'cloud' | 'phone' | 'wifi-ap' | 'wifi-client';
 
 export interface EndDevice {
   id: string;

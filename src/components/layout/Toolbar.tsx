@@ -15,12 +15,14 @@ const DEVICES = [
   { type: 'odf',         label: 'ODF',    color: '#78716c', desc: 'Optical Distribution Frame' },
 ];
 const END_DEVICES = [
-  { type: 'dev-pc',     label: '🖥 PC',      color: '#0891b2' },
-  { type: 'dev-laptop', label: '💻 Laptop',  color: '#0891b2' },
-  { type: 'dev-router', label: '📶 Router',  color: '#d97706' },
-  { type: 'dev-server', label: '🗄 Server',  color: '#7c3aed' },
-  { type: 'dev-cloud',  label: '☁️ Cloud',   color: '#64748b' },
-  { type: 'dev-phone',  label: '📱 Phone',   color: '#0891b2' },
+  { type: 'dev-pc',          label: '🖥 PC',         color: '#0891b2' },
+  { type: 'dev-laptop',      label: '💻 Laptop',     color: '#0891b2' },
+  { type: 'dev-router',      label: '📶 Router',     color: '#d97706' },
+  { type: 'dev-server',      label: '🗄 Server',     color: '#7c3aed' },
+  { type: 'dev-cloud',       label: '☁️ Cloud',      color: '#64748b' },
+  { type: 'dev-phone',       label: '📱 Phone',      color: '#0891b2' },
+  { type: 'dev-wifi-ap',     label: '📡 WiFi AP',    color: '#10b981' },
+  { type: 'dev-wifi-client', label: '📲 WiFi Client',color: '#06b6d4' },
 ];
 
 export function Toolbar() {
