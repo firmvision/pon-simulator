@@ -103,6 +103,24 @@ export interface EndDevice {
   deviceType: EndDeviceType;
   ipAddress: string;
   macAddress: string;
+  // Network config
+  subnetMask?: string;
+  gateway?: string;
+  dnsServer?: string;
+  hostname?: string;
+  // WiFi AP specific
+  ssid?: string;
+  wifiSecurity?: 'open' | 'WPA2' | 'WPA3';
+  wifiChannel?: number;
+  wifiFrequency?: '2.4GHz' | '5GHz' | 'dual-band';
+  wifiPassword?: string;
+  // Router specific
+  lanCidr?: string;
+  dhcpEnabled?: boolean;
+  // Server specific
+  services?: string;
+  // Generic notes
+  notes?: string;
   position: XYPosition;
 }
 
