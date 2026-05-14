@@ -1,5 +1,6 @@
 import type { ProjectFile } from '../types/topology';
 import { DEFAULT_DBA_PROFILES } from '../types/protocol';
+import { NEW_TOPOLOGIES } from './newTopologies';
 
 const gponSimple: ProjectFile = {
   version: '1.0',
@@ -389,9 +390,10 @@ const ftthMdu: ProjectFile = {
 };
 
 export const SAMPLE_TOPOLOGIES = [
-  { id: 'simple-gpon', name: 'Simple GPON', description: '1 OLT · 1:8 splitter · 8 ONUs · 3 km feeder', data: gponSimple },
-  { id: 'xgspon-enterprise', name: 'XGS-PON Enterprise', description: '1 OLT · 1:16 splitter · 16 SBUs · Type 1+4 T-CONTs', data: xgsPonEnterprise },
-  { id: 'cascaded-splitter', name: 'Cascaded Splitter', description: '2-stage ODN: 1:4 → 2×(1:4) → 8 ONUs · greenfield architecture', data: cascadedSplitter },
-  { id: 'budget-challenge', name: 'Budget Challenge', description: '1:32 splitter · long drops → green/amber/red link budget demo', data: budgetChallenge },
-  { id: 'ftth-mdu', name: 'FTTH MDU', description: 'Apartment building · 12 flats · HSI, VoIP, IPTV mixed services', data: ftthMdu },
+  { id: 'simple-gpon',       name: 'Simple GPON',         description: '1 OLT · 1:8 splitter · 8 ONUs · 3 km feeder', data: gponSimple },
+  { id: 'xgspon-enterprise', name: 'XGS-PON Enterprise',  description: '1 OLT · 1:16 splitter · 16 SBUs · Type 1+4 T-CONTs', data: xgsPonEnterprise },
+  { id: 'cascaded-splitter', name: 'Cascaded Splitter',   description: '2-stage ODN: 1:4 → 2×(1:4) → 8 ONUs · greenfield architecture', data: cascadedSplitter },
+  { id: 'budget-challenge',  name: 'Budget Challenge',    description: '1:32 splitter · long drops → green/amber/red link budget demo', data: budgetChallenge },
+  { id: 'ftth-mdu',          name: 'FTTH MDU',            description: 'Apartment building · 12 flats · HSI, VoIP, IPTV mixed services', data: ftthMdu },
+  ...NEW_TOPOLOGIES,
 ];

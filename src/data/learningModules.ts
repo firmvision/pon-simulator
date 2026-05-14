@@ -19,6 +19,8 @@ export interface TheorySection {
   table?: { headers: string[]; rows: string[][] };
 }
 
+import { NEW_MODULES } from './newModules';
+
 export interface LearningModule {
   id: string;
   title: string;
@@ -456,4 +458,5 @@ export const LEARNING_MODULES: LearningModule[] = [
       },
     ],
   },
+  ...NEW_MODULES,
 ];

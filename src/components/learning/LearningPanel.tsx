@@ -31,6 +31,12 @@ function checkObjective(checker: string): boolean {
     case 'terminal-ont-info': return ui.terminalHistory.some(h => h.includes('display ont info'));
     case 'terminal-service-port': return ui.terminalHistory.some(h => h.includes('service-port') || h.includes('display service'));
     case 'terminal-dba': return ui.terminalHistory.some(h => h.includes('dba-profile'));
+    // New checkers for extended modules
+    case 'has-odf': return Object.keys(topo.odfs).length > 0;
+    case 'has-end-device': return Object.keys(topo.endDevices).length > 0;
+    case 'has-wifi-ap': return Object.values(topo.endDevices).some(d => d.deviceType === 'wifi-ap');
+    case 'has-router': return Object.values(topo.endDevices).some(d => d.deviceType === 'router');
+    case 'has-onu': return Object.keys(topo.onus).length > 0;
     default: return false;
   }
 }
@@ -157,9 +163,15 @@ function LabView({ module, objectives }: { module: LearningModule; objectives: R
       </div>
 
       {pct === 100 && (
-        <div style={{ marginTop: 12, padding: '8px 10px', background: '#052e16', border: '1px solid #166534', borderRadius: 4, textAlign: 'center' }}>
-          <div style={{ color: '#22c55e', fontSize: 12 }}>✓ Lab Complete!</div>
-          <div style={{ color: '#4ade80', fontSize: 9, marginTop: 2 }}>Try the Quiz to test your knowledge</div>
+        <div style={{ marginTop: 12, padding: '12px 10px', background: '#052e16', border: '2px solid #166534', borderRadius: 8, textAlign: 'center' }}>
+          <div style={{ fontSize: 28, marginBottom: 4 }}>🏅</div>
+          <div style={{ color: '#22c55e', fontSize: 13, fontWeight: 700 }}>Lab Complete!</div>
+          <div style={{ color: '#4ade80', fontSize: 10, marginTop: 4 }}>
+            All {total} objectives completed — excellent work!
+          </div>
+          <div style={{ marginTop: 8, padding: '4px 8px', background: '#14532d', borderRadius: 4, display: 'inline-block', color: '#86efac', fontSize: 9 }}>
+            Grade: <strong>A</strong> · Proceed to the Quiz →
+          </div>
         </div>
       )}
     </div>
@@ -178,23 +190,64 @@ function QuizView({ module }: { module: LearningModule }) {
 
   if (done) {
     const pct = Math.round((score / module.quiz.length) * 100);
-    const grade = pct === 100 ? 'Perfect!' : pct >= 67 ? 'Good' : 'Keep studying';
-    const gradeColor = pct === 100 ? '#22c55e' : pct >= 67 ? '#f59e0b' : '#ef4444';
+    const letterGrade = pct === 100 ? 'A+' : pct >= 90 ? 'A' : pct >= 80 ? 'B' : pct >= 67 ? 'C' : pct >= 50 ? 'D' : 'F';
+    const gradeLabel  = pct === 100 ? 'Perfect Score!' : pct >= 80 ? 'Excellent' : pct >= 67 ? 'Good' : pct >= 50 ? 'Needs Review' : 'Keep Studying';
+    const gradeColor  = pct >= 80 ? '#22c55e' : pct >= 67 ? '#f59e0b' : '#ef4444';
+    const passed = pct >= 67;
     return (
-      <div style={{ padding: '16px 10px', textAlign: 'center' }}>
-        <div style={{ fontSize: 32, marginBottom: 8 }}>
-          {pct === 100 ? '🏆' : pct >= 67 ? '📚' : '🔄'}
+      <div style={{ padding: '12px 10px', textAlign: 'center', overflowY: 'auto', flex: 1 }}>
+        <div style={{ fontSize: 36, marginBottom: 6 }}>
+          {pct === 100 ? '🏆' : pct >= 80 ? '🥇' : pct >= 67 ? '📚' : '🔄'}
         </div>
-        <div style={{ color: gradeColor, fontSize: 18, fontWeight: 700 }}>{grade}</div>
-        <div style={{ color: '#94a3b8', fontSize: 12, marginTop: 4 }}>
-          {score}/{module.quiz.length} correct ({pct}%)
+
+        {/* Grade badge */}
+        <div style={{
+          display: 'inline-flex', alignItems: 'center', gap: 6,
+          background: gradeColor + '22', border: `2px solid ${gradeColor}44`,
+          borderRadius: 10, padding: '6px 16px', marginBottom: 8,
+        }}>
+          <span style={{ color: gradeColor, fontSize: 24, fontWeight: 900, fontFamily: 'monospace' }}>{letterGrade}</span>
+          <span style={{ color: gradeColor, fontSize: 11 }}>{gradeLabel}</span>
         </div>
-        <button
-          onClick={() => { setQIdx(0); setSelected(null); setSubmitted(false); setScore(0); setDone(false); }}
-          style={{ marginTop: 12, padding: '6px 16px', background: '#1d4ed8', border: 'none', borderRadius: 4, color: '#fff', cursor: 'pointer', fontSize: 11 }}
-        >
-          Retry Quiz
-        </button>
+
+        <div style={{ color: '#94a3b8', fontSize: 12, marginTop: 4, marginBottom: 12 }}>
+          {score}/{module.quiz.length} correct · {pct}%
+        </div>
+
+        {/* Certificate (pass only) */}
+        {passed && (
+          <div style={{
+            margin: '0 0 12px 0', padding: '10px 12px',
+            background: '#0a0f1e', border: '1px solid #1e3a5f',
+            borderRadius: 8, textAlign: 'left',
+          }}>
+            <div style={{ color: '#60a5fa', fontSize: 10, fontWeight: 700, marginBottom: 4 }}>
+              📜 Certificate of Completion
+            </div>
+            <div style={{ color: '#64748b', fontSize: 9, lineHeight: 1.6 }}>
+              This confirms that you have successfully completed<br />
+              <strong style={{ color: '#94a3b8' }}>{module.icon} {module.title}</strong><br />
+              with a score of <strong style={{ color: gradeColor }}>{pct}% (Grade {letterGrade})</strong>
+            </div>
+          </div>
+        )}
+
+        <div style={{ display: 'flex', gap: 6 }}>
+          <button
+            onClick={() => { setQIdx(0); setSelected(null); setSubmitted(false); setScore(0); setDone(false); }}
+            style={{ flex: 1, padding: '7px 0', background: '#1e293b', border: '1px solid #334155', borderRadius: 5, color: '#94a3b8', cursor: 'pointer', fontSize: 11 }}
+          >
+            🔄 Retry
+          </button>
+          {!passed && (
+            <button
+              onClick={() => { setQIdx(0); setSelected(null); setSubmitted(false); setScore(0); setDone(false); }}
+              style={{ flex: 1, padding: '7px 0', background: '#1d4ed8', border: 'none', borderRadius: 5, color: '#fff', cursor: 'pointer', fontSize: 11 }}
+            >
+              📖 Review Theory
+            </button>
+          )}
+        </div>
       </div>
     );
   }
